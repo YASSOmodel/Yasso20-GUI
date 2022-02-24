@@ -1,0 +1,10 @@
+[enable.toolkits]
+null = enable.null.toolkit:toolkit
+qt = enable.qt4.toolkit:toolkit
+qt4 = enable.qt4.toolkit:toolkit
+wx = enable.wx.toolkit:toolkit
+
+[etsdemo_data]
+enable_examples = enable.examples._etsdemo_info:info
+kiva_examples = kiva.examples._etsdemo_info:info
+
