@@ -381,8 +381,7 @@ class Yasso(HasTraits):
             steady_state = self.yassorunner.compute_steady_state(self)
             self._set_steady_state(steady_state)
         self._init_results()
-        self.c_stock, self.c_change, self.co2_yield = \
-            self.yassorunner.run_model(self)
+        self.c_stock, self.c_change, self.co2_yield = self.yassorunner.run_model(self)
 
         self._create_co2_plot()
         self._chart_type_changed()

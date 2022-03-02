@@ -109,24 +109,24 @@ ui_view = View(
                          ),
                 ),
                 HGroup(
-                    # Item('monthly_climate', show_label=False,
-                    #      visible_when='climate_mode=="monthly"',
-                    #      editor=monthly_climate_te, width=200, height=75
-                    #      ),
+                    Item('monthly_climate', show_label=False,
+                         visible_when='climate_mode=="monthly"',
+                         editor=monthly_climate_te, width=200, height=75
+                         ),
                     Item('yearly_climate', show_label=False,
                          visible_when='climate_mode=="yearly"',
                          editor=yearly_climate_te, width=200, height=75
                          ),
-                    # VGroup(
-                    #     Item('object.constant_climate.mean_temperature',
-                    #          style='readonly', ),
-                    #     Item('object.constant_climate.annual_rainfall',
-                    #          style='readonly', ),
-                    #     Item('object.constant_climate.variation_amplitude',
-                    #          style='readonly', ),
-                    #     show_border=True,
-                    #     visible_when='climate_mode=="constant yearly"'
-                    # ),
+                    VGroup(
+                        Item('object.constant_climate.mean_temperature',
+                             style='readonly', ),
+                        Item('object.constant_climate.annual_rainfall',
+                             style='readonly', ),
+                        Item('object.constant_climate.variation_amplitude',
+                             style='readonly', ),
+                        show_border=True,
+                        visible_when='climate_mode=="constant yearly"'
+                    ),
                 ),
             ),
             label='Data to use',

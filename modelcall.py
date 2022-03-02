@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#from __future__ import with_statement
+# from __future__ import with_statement
 
-import y15
+import y07, y15, y20
 import numpy
 import math
 import struct
@@ -26,6 +26,7 @@ STEADY_STATE_TIMESTEP = 10000.
 PARAM_SAMPLES = 10000
 
 
+
 class ModelRunner(object):
     """
     This class is responsible for calling the actual Yasso07 modeldata.
@@ -37,6 +38,8 @@ class ModelRunner(object):
         """
         Constructor.
         """
+        self.temp_list = []
+        self.parameter_set = ''
         self.param_set = []
         self._param_file_shape = None
         with open(parfile) as f:
@@ -45,7 +48,7 @@ class ModelRunner(object):
                 self.param_set.append([float(v.strip()) for v in line_split])
                 if line.strip():
                     self._param_file_shape = len(line_split)
-                    
+
     def is_usable_parameter_file(self):
         """Returns True, if the parameter file has a suitable number of
         parameters that can be used."""
@@ -57,7 +60,7 @@ class ModelRunner(object):
         """
         self.simulation = False
         self.md = modeldata
-        self.steady_state = numpy.empty(shape=(0,6), dtype=numpy.float32)
+        self.steady_state = numpy.empty(shape=(0, 6), dtype=numpy.float32)
         self.timemap = defaultdict(list)
         self.area_timemap = defaultdict(list)
         samplesize = self.md.sample_size
@@ -76,18 +79,18 @@ class ModelRunner(object):
         self._steadystate2initial()
         return self.ss_result
 
-
     def run_model(self, modeldata):
+        self.parameter_set = modeldata.parameter_set
         self.simulation = True
         self.md = modeldata
-        self.c_stock = numpy.empty(shape=(0,10), dtype=numpy.float32)
-        self.c_change = numpy.empty(shape=(0,10), dtype=numpy.float32)
-        self.co2_yield = numpy.empty(shape=(0,3), dtype=numpy.float32)
+        self.c_stock = numpy.empty(shape=(0, 10), dtype=numpy.float32)
+        self.c_change = numpy.empty(shape=(0, 10), dtype=numpy.float32)
+        self.co2_yield = numpy.empty(shape=(0, 3), dtype=numpy.float32)
         self.timemap = defaultdict(list)
         self.area_timemap = defaultdict(list)
         samplesize = self.md.sample_size
         msg = "Simulating %d samples for %d timesteps" % (samplesize,
-                                                    self.md.simulation_length)
+                                                          self.md.simulation_length)
         progress = ProgressDialog(title="Simulation", message=msg,
                                   max=samplesize, show_time=True,
                                   can_cancel=True)
@@ -97,7 +100,7 @@ class ModelRunner(object):
         self.ml_run = True
         self.infall = {}
         self.initial_mode = self.md.initial_mode
-        if self.initial_mode=='steady state':
+        if self.initial_mode == 'steady state':
             self.initial_def = self.md.steady_state
         else:
             self.initial_def = self.md.initial_litter
@@ -129,7 +132,7 @@ class ModelRunner(object):
         cs = self.c_stock
         # if sizeclass is non-zero, all the components are added together
         # to get the mass of wood
-        if sc>=self.md.woody_size_limit:
+        if sc >= self.md.woody_size_limit:
             totalom = endstate.sum()
             woody = totalom
             nonwoody = 0.0
@@ -142,13 +145,13 @@ class ModelRunner(object):
         res.shape = (1, 10)
         # find out whether there are already results for this timestep and
         # iteration
-        criterium = (cs[:,0]==res[0,0]) & (cs[:,1]==res[0,1])
+        criterium = (cs[:, 0] == res[0, 0]) & (cs[:, 1] == res[0, 1])
         target = numpy.where(criterium)[0]
         if len(target) == 0:
             self.c_stock = numpy.append(cs, res, axis=0)
         else:
             # if there are, add the new results to the existing ones
-            self.c_stock[target[0],2:] = numpy.add(cs[target[0],2:], res[0,2:])
+            self.c_stock[target[0], 2:] = numpy.add(cs[target[0], 2:], res[0, 2:])
 
     def _add_steady_state_result(self, sc, endstate):
         """
@@ -159,7 +162,7 @@ class ModelRunner(object):
         """
         res = numpy.concatenate(([float(sc)], endstate))
         res.shape = (1, 6)
-        self.steady_state= numpy.append(self.steady_state, res, axis=0)
+        self.steady_state = numpy.append(self.steady_state, res, axis=0)
 
     def _calculate_c_change(self, s, ts):
         """
@@ -170,11 +173,11 @@ class ModelRunner(object):
         """
         cc = self.c_change
         cs = self.c_stock
-        criterium = (cs[:,0]==s) & (cs[:,1]==ts)
+        criterium = (cs[:, 0] == s) & (cs[:, 1] == ts)
         nowtarget = numpy.where(criterium)[0]
-        criterium = (cs[:,0]==s) & (cs[:,1]==ts-1)
+        criterium = (cs[:, 0] == s) & (cs[:, 1] == ts - 1)
         prevtarget = numpy.where(criterium)[0]
-        if len(nowtarget) > 0 and len(prevtarget)>0:
+        if len(nowtarget) > 0 and len(prevtarget) > 0:
             stepinf = numpy.array([[s, ts, 0., 0., 0., 0., 0., 0., 0., 0.]],
                                   dtype=numpy.float32)
             self.c_change = numpy.append(cc, stepinf, axis=0)
@@ -192,9 +195,9 @@ class ModelRunner(object):
         stepinf = numpy.array([[s, ts, 0.]], dtype=numpy.float32)
         self.co2_yield = numpy.append(cy, stepinf, axis=0)
         # total organic matter at index 3
-        criterium = (cs[:,0]==s) & (cs[:,1]==ts)
+        criterium = (cs[:, 0] == s) & (cs[:, 1] == ts)
         rowind = numpy.where(criterium)[0]
-        if len(rowind)>0:
+        if len(rowind) > 0:
             atend = cs[rowind[0], 2]
             co2_as_c = self.ts_initial + self.ts_infall - atend
             self.co2_yield[-1, 2] = co2_as_c
@@ -206,7 +209,7 @@ class ModelRunner(object):
         """
         cl = {}
         now, end = self._get_now_and_end(timestep)
-        if now==-1:
+        if now == -1:
             return -1
         if self.simulation:
             if self.md.duration_unit == 'month':
@@ -236,7 +239,7 @@ class ModelRunner(object):
         """
         # how many months should we aggregate
         if self.simulation:
-            if self.md.duration_unit=='month':
+            if self.md.duration_unit == 'month':
                 months = range(self.timestep_length)
             else:
                 months = range(12 * self.timestep_length)
@@ -263,7 +266,7 @@ class ModelRunner(object):
         cl['rain'] = rain / len(months)
         cl['temp'] = temp / len(months)
         cl['amplitude'] = (maxtemp - mintemp) / 2.0
-        
+
         return cl
 
     def _construct_yearly_climate(self, cl, now, end):
@@ -278,7 +281,7 @@ class ModelRunner(object):
         """
         if self.simulation:
             years = range(now.year, end.year + 1)
-            if len(years)>1:
+            if len(years) > 1:
                 # the ordinals of days within the year
                 lastord = float(date(now.year, 12, 31).timetuple()[7])
                 noword = float(now.timetuple()[7])
@@ -296,16 +299,16 @@ class ModelRunner(object):
         temp = 0.0
         ampl = 0.0
         addyear = True
-        if len(years)==1:
+        if len(years) == 1:
             firstyearweight = 1.0
-            if now.year==end.year and not(end.month==12 and end.day==31):
+            if now.year == end.year and not (end.month == 12 and end.day == 31):
                 addyear = False
         maxind = len(self.md.yearly_climate) - 1
         for ind in range(len(years)):
             if self.curr_yr_ind > maxind:
                 self.curr_yr_ind = 0
             cy = self.md.yearly_climate[self.curr_yr_ind]
-            if self.simulation and cy.timestep==0:
+            if self.simulation and cy.timestep == 0:
                 # timestep 0 is used only for steady state calculation
                 self.curr_yr_ind += 1
                 if self.curr_yr_ind <= maxind:
@@ -327,8 +330,13 @@ class ModelRunner(object):
             self.curr_yr_ind -= 1
             if self.curr_yr_ind < 0:
                 self.curr_yr_ind = len(self.md.yearly_climate) - 1
+
+        for year in self.md.yearly_climate:
+            if len(self.temp_list) < len(years):
+                self.temp_list.append(year.mean_temperature)
+
+        cl['temp'] = self.temp_list
         cl['rain'] = rain / len(years)
-        cl['temp'] = temp / len(years)
         cl['amplitude'] = ampl / len(years)
         return cl
 
@@ -341,7 +349,7 @@ class ModelRunner(object):
         self.litter = {}
         if timestep == 0:
             self.initial = {}
-            if self.initial_mode!='zero':
+            if self.initial_mode != 'zero':
                 self._define_components(self.initial_def, self.initial)
         if self.md.litter_mode == 'constant yearly':
             self._define_components(self.md.constant_litter, self.litter)
@@ -351,14 +359,12 @@ class ModelRunner(object):
             pass
         else:
             timeind = self._map_timestep2timeind(timestep)
-            if self.md.litter_mode=='monthly':
+            if self.md.litter_mode == 'monthly':
                 infdata = self.md.monthly_litter
-            elif self.md.litter_mode=='yearly':
+            elif self.md.litter_mode == 'yearly':
                 infdata = self.md.yearly_litter
             self._define_components(infdata, self.litter, tsind=timeind)
         self._fill_input()
-        
-    
 
     def _define_components(self, fromme, tome, tsind=None):
         """
@@ -394,7 +400,7 @@ class ModelRunner(object):
                 n_std += mass * litter.non_soluble_std
                 h_std += mass * litter.humus_std
             if m > 0.:
-                tome[sc] = [m , m_std / m, a / m, a_std / m, w / m, w_std / m,
+                tome[sc] = [m, m_std / m, a / m, a_std / m, w / m, w_std / m,
                             e / m, e_std / m, n / m, n_std / m,
                             h / m, h_std / m]
             else:
@@ -413,12 +419,12 @@ class ModelRunner(object):
         # sample size one less than pairs specification as pairs contain
         # the total mass and component percentages. These are transformed
         # into component masses
-        sample = [None for i in range(len(pairs)-1)]
+        sample = [None for i in range(len(pairs) - 1)]
         for i in range(len(pairs)):
             vs = pairs[i]
-            mean = values[2*i]
-            std = values[2*i+1]
-            if std>0.0 and randomize:
+            mean = values[2 * i]
+            std = values[2 * i + 1]
+            if std > 0.0 and randomize:
                 samplemean = random.gauss(mean, std)
             else:
                 samplemean = mean
@@ -441,10 +447,10 @@ class ModelRunner(object):
         Also scales the total mass with the relative area change if defined.
         """
         mass = endstate.sum()
-        
+
         # Avoid division by 0 or negative masses.
         mass_sum = mass if mass > 0 else 1
-            
+
         acid = endstate[0] / mass_sum
         water = endstate[1] / mass_sum
         ethanol = endstate[2] / mass_sum
@@ -484,7 +490,7 @@ class ModelRunner(object):
                      ('stock_non_woody', self.c_stock, 4),
                      ('stock_acid', self.c_stock, 5),
                      ('stock_water', self.c_stock, 6),
-                     ('stock_ethanol',  self.c_stock, 7),
+                     ('stock_ethanol', self.c_stock, 7),
                      ('stock_non_soluble', self.c_stock, 8),
                      ('stock_humus', self.c_stock, 9),
                      ('change_tom', self.c_change, 2),
@@ -498,73 +504,74 @@ class ModelRunner(object):
                      ('co2', self.co2_yield, 2)]
         for (resto, dataarr, dataind) in toprocess:
             # filter time steps
-            ts = numpy.unique(dataarr[:,1])
+            ts = numpy.unique(dataarr[:, 1])
             # extract data for the timestep
             for timestep in ts:
-                ind = numpy.where(dataarr[:,1]==timestep)
+                ind = numpy.where(dataarr[:, 1] == timestep)
                 mean = stats.mean(dataarr[ind[0], dataind])
                 mode_res = stats.mode(dataarr[ind[0], dataind])
                 mode = mode_res[0]
                 var = stats.var(dataarr[ind[0], dataind])
                 skew = stats.skew(dataarr[ind[0], dataind])
                 kurtosis = stats.kurtosis(dataarr[ind[0], dataind])
-                if var>0.0:
+                if var > 0.0:
                     sd2 = 2 * math.sqrt(var)
                 else:
                     sd2 = var
                 res = [[timestep, mean, mode[0], var, skew, kurtosis,
-                       mean - sd2, mean + sd2]]
-                if resto=='stock_tom':
+                        mean - sd2, mean + sd2]]
+                if resto == 'stock_tom':
                     self.md.stock_tom = numpy.append(self.md.stock_tom,
                                                      res, axis=0)
-                elif resto=='stock_woody':
+                elif resto == 'stock_woody':
                     self.md.stock_woody = numpy.append(self.md.stock_woody,
                                                        res, axis=0)
-                elif resto=='stock_non_woody':
-                    self.md.stock_non_woody = numpy.append(\
-                            self.md.stock_non_woody, res, axis=0)
-                elif resto=='stock_acid':
+                elif resto == 'stock_non_woody':
+                    self.md.stock_non_woody = numpy.append(
+                        self.md.stock_non_woody, res, axis=0
+                    )
+                elif resto == 'stock_acid':
                     self.md.stock_acid = numpy.append(self.md.stock_acid,
                                                       res, axis=0)
-                elif resto=='stock_water':
+                elif resto == 'stock_water':
                     self.md.stock_water = numpy.append(self.md.stock_water,
                                                        res, axis=0)
-                elif resto=='stock_ethanol':
+                elif resto == 'stock_ethanol':
                     self.md.stock_ethanol = numpy.append(self.md.stock_ethanol,
                                                          res, axis=0)
-                elif resto=='stock_non_soluble':
-                    self.md.stock_non_soluble= numpy.append(
-                                        self.md.stock_non_soluble, res, axis=0)
-                elif resto=='stock_humus':
+                elif resto == 'stock_non_soluble':
+                    self.md.stock_non_soluble = numpy.append(
+                        self.md.stock_non_soluble, res, axis=0)
+                elif resto == 'stock_humus':
                     self.md.stock_humus = numpy.append(self.md.stock_humus,
                                                        res, axis=0)
-                elif resto=='change_tom':
+                elif resto == 'change_tom':
                     self.md.change_tom = numpy.append(self.md.change_tom,
                                                       res, axis=0)
-                elif resto=='change_woody':
+                elif resto == 'change_woody':
                     self.md.change_woody = numpy.append(self.md.change_woody,
                                                         res, axis=0)
-                elif resto=='change_non_woody':
-                    self.md.change_non_woody = numpy.append(\
-                            self.md.change_non_woody, res, axis=0)
-                elif resto=='change_acid':
+                elif resto == 'change_non_woody':
+                    self.md.change_non_woody = numpy.append(
+                        self.md.change_non_woody, res, axis=0
+                    )
+                elif resto == 'change_acid':
                     self.md.change_acid = numpy.append(self.md.change_acid,
                                                        res, axis=0)
-                elif resto=='change_water':
+                elif resto == 'change_water':
                     self.md.change_water = numpy.append(self.md.change_water,
                                                         res, axis=0)
-                elif resto=='change_ethanol':
+                elif resto == 'change_ethanol':
                     self.md.change_ethanol = numpy.append(
-                                            self.md.change_ethanol, res, axis=0)
-                elif resto=='change_non_soluble':
-                    self.md.change_non_soluble=numpy.append(
-                                        self.md.change_non_soluble, res, axis=0)
-                elif resto=='change_humus':
+                        self.md.change_ethanol, res, axis=0)
+                elif resto == 'change_non_soluble':
+                    self.md.change_non_soluble = numpy.append(
+                        self.md.change_non_soluble, res, axis=0)
+                elif resto == 'change_humus':
                     self.md.change_humus = numpy.append(self.md.change_humus,
                                                         res, axis=0)
-                elif resto=='co2':
+                elif resto == 'co2':
                     self.md.co2 = numpy.append(self.md.co2, res, axis=0)
-
 
     def _get_now_and_end(self, timestep):
         """
@@ -598,37 +605,37 @@ class ModelRunner(object):
         """
         if not self.simulation and timestep not in self.timemap:
             # for steady state computation include year 0 or first 12 months
-            if self.md.litter_mode=='monthly':
+            if self.md.litter_mode == 'monthly':
                 incl = range(1, 13)
                 infall = self.md.monthly_litter
-            elif self.md.litter_mode=='yearly':
+            elif self.md.litter_mode == 'yearly':
                 incl = [0]
                 infall = self.md.yearly_litter
-            elif self.md.litter_mode=='zero':
+            elif self.md.litter_mode == 'zero':
                 infall = []
             for ind in range(len(infall)):
                 if infall[ind].timestep in incl:
                     self.timemap[timestep].append(ind)
-            if timestep not in self.timemap and self.md.litter_mode=='yearly':
+            if timestep not in self.timemap and self.md.litter_mode == 'yearly':
                 # if no year 0 specification, use the one for year 1
                 for ind in range(len(infall)):
-                    if infall[ind].timestep==1:
+                    if infall[ind].timestep == 1:
                         self.timemap[timestep].append(ind)
         if self.simulation and timestep not in self.timemap:
             # now for the simulation run
             now, end = self._get_now_and_end(timestep)
-            if self.md.duration_unit=='month':
+            if self.md.duration_unit == 'month':
                 dur = relativedelta(months=self.timestep_length)
-            elif self.md.duration_unit=='year':
+            elif self.md.duration_unit == 'year':
                 dur = relativedelta(years=self.timestep_length)
             end = now + dur - relativedelta(days=1)
-            if self.md.litter_mode=='monthly':
+            if self.md.litter_mode == 'monthly':
                 inputdur = relativedelta(months=1)
                 infall = self.md.monthly_litter
-            elif self.md.litter_mode=='yearly':
+            elif self.md.litter_mode == 'yearly':
                 inputdur = relativedelta(years=1)
                 infall = self.md.yearly_litter
-            elif self.md.litter_mode=='zero':
+            elif self.md.litter_mode == 'zero':
                 inputdur = relativedelta(years=1)
                 infall = self.md.zero_litter
             # the first mont/year will have index number 1, hence deduce 1 m/y
@@ -651,11 +658,11 @@ class ModelRunner(object):
 
     def _test4inclusion(self, ind, dataarray, now, start, end):
         relamount = int(dataarray[ind].timestep)
-        if self.md.litter_mode=='monthly':
+        if self.md.litter_mode == 'monthly':
             inputdate = start + relativedelta(months=relamount)
         else:
             inputdate = start + relativedelta(years=relamount)
-        if inputdate>=now and inputdate<=end:
+        if inputdate >= now and inputdate <= end:
             return True
         else:
             return False
@@ -697,27 +704,33 @@ class ModelRunner(object):
         dur = climate['duration']
         init = na(initial, dtype=f32)
         # convert input to yearly input in all cases
-        if not self.simulation or self.md.litter_mode=='constant yearly':
+        if not self.simulation or self.md.litter_mode == 'constant yearly':
             inf = na(self.infall[sc], dtype=f32)
         else:
             inf = na(self.infall[sc], dtype=f32) / dur
-        cl = na([climate['temp'], climate['rain'], climate['amplitude']],
-                dtype=f32)
-                
+
+        temp = na(climate.get('temp'), dtype=f32)
+        rain = climate.get('rain')
+
         # If we're using steady state as original state,
         # the leach parameters are not allowed to be set.
         leach = self.md.leach_parameter
         if self._param_file_shape == 35:
-            # The Yasso15 -model call.
-            endstate = y15.yasso.mod5c(par, dur, cl, init, inf, sc, leach,
-                    steady_state)
+            if self.parameter_set == 'Yasso07':
+                endstate = y07.yasso.mod5c(
+                    par, dur, temp, rain, init, inf, sc, leach, steady_state
+                )
+            elif self.parameter_set == 'Yasso15':
+                endstate = y15.yasso.mod5c(
+                    par, dur, temp, rain, init, inf, sc, leach, steady_state
+                )
+            elif self.parameter_set == 'Yasso20':
+                endstate = y20.yasso20.mod5c20(
+                    par, dur, temp, rain, init, inf, sc, leach, steady_state
+                )
         else:
             raise Exception("Invalid number of parameters in parameter file.")
-            # This would be how the old model used this.
-            #if cl[1] == 0.0:
-            #    cl[1] = 0.1 # The Fortran routine fails if precipitation is 0.
-            #endstate = y07.yasso.mod5c(par, dur, cl, init, inf, sc, leach)
-        
+
         self.ts_initial += sum(initial)
         self.ts_infall += sum(self.infall[sc])
         return init, endstate.copy()
@@ -727,24 +740,25 @@ class ModelRunner(object):
         Loops over all the size classes for the given sample and timestep
         """
         climate = self._construct_climate(timestep)
-        if climate==-1:
-            timemsg = "Simulation extends too far into the future."\
+        if climate == -1:
+            timemsg = "Simulation extends too far into the future." \
                       " Couldn't allocate inputs to all timesteps"
             return
         self.ts_initial = 0.0
         self.ts_infall = 0.0
         self.__create_input(timestep)
+
         for sizeclass in self.initial:
             initial, endstate = self._predict(sizeclass,
                                               self.initial[sizeclass],
                                               self.litter[sizeclass], climate)
-            if timestep==0:
+            if timestep == 0:
                 self._add_c_stock_result(sample, timestep, sizeclass, initial)
-            self._add_c_stock_result(sample, timestep+1, sizeclass, endstate)
+            self._add_c_stock_result(sample, timestep + 1, sizeclass, endstate)
             self._endstate2initial(sizeclass, endstate, timestep)
             self.draw = False
-        self._calculate_c_change(sample, timestep+1)
-        self._calculate_co2_yield(sample, timestep+1)
+        self._calculate_c_change(sample, timestep + 1)
+        self._calculate_co2_yield(sample, timestep + 1)
 
     def _predict_steady_state(self, sample):
         """
@@ -769,9 +783,9 @@ class ModelRunner(object):
         """
         self.ss_result = []
         ss = self.steady_state
-        sizeclasses = numpy.unique(ss[:,0])
+        sizeclasses = numpy.unique(ss[:, 0])
         for sc in sizeclasses:
-            criterium = (ss[:,0]==sc)
+            criterium = (ss[:, 0] == sc)
             target = numpy.where(criterium)[0]
             div = len(target)
             masses = [ss[t, 1:].sum() for t in target]
@@ -801,7 +815,7 @@ class ModelRunner(object):
         Computes the standard deviation
         """
         var = stats.var(data)
-        if var>0.0:
+        if var > 0.0:
             sd = math.sqrt(var)
         else:
             sd = 0.0
