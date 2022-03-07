@@ -46,7 +46,7 @@ def get_parameter_files():
             p = os.path.basename(f).split('.')[0]
             pset.append(p)
 
-        return pset
+        return sorted(pset)
     else:
         print(f"Not finding the parameter directory {pdir}")
         errmsg = """

@@ -192,7 +192,9 @@ class Yasso(HasTraits):
             about_text = cfg.get("about", "text")
             about_text = about_text.replace("\\n", "\n")
 
-            self.parameter_set = self.p_sets[-1]
+            default_param = cfg.get("data", "default_param")
+            if default_param in self.p_sets:
+                self.parameter_set = default_param
 
             self.trait_view('about_text').label = about_text
 

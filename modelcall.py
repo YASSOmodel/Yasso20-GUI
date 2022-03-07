@@ -213,9 +213,9 @@ class ModelRunner(object):
             return -1
         if self.simulation:
             if self.md.duration_unit == 'month':
-                cl['duration'] = self.timestep_length / 12.
+                cl['duration'] = self.md.timestep_length / 12.
             elif self.md.duration_unit == 'year':
-                cl['duration'] = self.timestep_length
+                cl['duration'] = self.md.timestep_length
         else:
             cl['duration'] = STEADY_STATE_TIMESTEP
         if self.md.climate_mode == 'constant yearly':
@@ -240,9 +240,9 @@ class ModelRunner(object):
         # how many months should we aggregate
         if self.simulation:
             if self.md.duration_unit == 'month':
-                months = range(self.timestep_length)
+                months = range(self.md.timestep_length)
             else:
-                months = range(12 * self.timestep_length)
+                months = range(12 * self.md.timestep_length)
         else:
             # use the first year for steady state computation
             months = range(12)
@@ -334,6 +334,8 @@ class ModelRunner(object):
         for year in self.md.yearly_climate:
             if len(self.temp_list) < len(years):
                 self.temp_list.append(year.mean_temperature)
+            else:
+                break
 
         cl['temp'] = self.temp_list
         cl['rain'] = rain / len(years)
@@ -581,7 +583,7 @@ class ModelRunner(object):
         rd = relativedelta
         start = STARTDATE
         if self.simulation:
-            tslength = self.timestep_length
+            tslength = self.md.timestep_length
         else:
             tslength = 1
         try:
@@ -625,9 +627,9 @@ class ModelRunner(object):
             # now for the simulation run
             now, end = self._get_now_and_end(timestep)
             if self.md.duration_unit == 'month':
-                dur = relativedelta(months=self.timestep_length)
+                dur = relativedelta(months=self.md.timestep_length)
             elif self.md.duration_unit == 'year':
-                dur = relativedelta(years=self.timestep_length)
+                dur = relativedelta(years=self.md.timestep_length)
             end = now + dur - relativedelta(days=1)
             if self.md.litter_mode == 'monthly':
                 inputdur = relativedelta(months=1)
