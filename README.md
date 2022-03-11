@@ -25,4 +25,4 @@ Then just open yasso.
 The first run can be long, due to the fact that all libraries are loaded. Next launch is very fast.
 
 [Yasso.exe]:https://drive.google.com/file/d/11EYaSXY_rkW_C2K4MFD_g1OXxqmA8tgj/view?usp=sharing
-[Yasso]:https://drive.google.com/file/d/1O6ZXqKNcTq-z_TaqoExIc0hLqkRzWkMP/view?usp=sharing
+[Yasso]:https://drive.google.com/file/d/1V-hLBhRwIANKp16Pr6mAFHym-4eTFv9x/view?usp=sharing

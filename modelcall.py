@@ -39,7 +39,6 @@ class ModelRunner(object):
         Constructor.
         """
         self.temp_list = []
-        self.parameter_set = ''
         self.param_set = []
         self._param_file_shape = None
         with open(parfile) as f:
@@ -80,7 +79,6 @@ class ModelRunner(object):
         return self.ss_result
 
     def run_model(self, modeldata):
-        self.parameter_set = modeldata.parameter_set
         self.simulation = True
         self.md = modeldata
         self.c_stock = numpy.empty(shape=(0, 10), dtype=numpy.float32)
@@ -217,7 +215,8 @@ class ModelRunner(object):
             elif self.md.duration_unit == 'year':
                 cl['duration'] = self.md.timestep_length
         else:
-            cl['duration'] = STEADY_STATE_TIMESTEP
+            # cl['duration'] = STEADY_STATE_TIMESTEP
+            cl['duration'] = self.md.timestep_length
         if self.md.climate_mode == 'constant yearly':
             cl['rain'] = self.md.constant_climate.annual_rainfall
             cl['temp'] = self.md.constant_climate.mean_temperature
@@ -332,7 +331,7 @@ class ModelRunner(object):
                 self.curr_yr_ind = len(self.md.yearly_climate) - 1
 
         for year in self.md.yearly_climate:
-            if len(self.temp_list) < len(years):
+            if len(self.temp_list) < cl.get('duration'):
                 self.temp_list.append(year.mean_temperature)
             else:
                 break
@@ -718,15 +717,15 @@ class ModelRunner(object):
         # the leach parameters are not allowed to be set.
         leach = self.md.leach_parameter
         if self._param_file_shape == 35:
-            if self.parameter_set == 'Yasso07':
+            if self.md.parameter_set == 'Yasso07':
                 endstate = y07.yasso.mod5c(
                     par, dur, temp, rain, init, inf, sc, leach, steady_state
                 )
-            elif self.parameter_set == 'Yasso15':
+            elif self.md.parameter_set == 'Yasso15':
                 endstate = y15.yasso.mod5c(
                     par, dur, temp, rain, init, inf, sc, leach, steady_state
                 )
-            elif self.parameter_set == 'Yasso20':
+            elif self.md.parameter_set == 'Yasso20':
                 endstate = y20.yasso20.mod5c20(
                     par, dur, temp, rain, init, inf, sc, leach, steady_state
                 )

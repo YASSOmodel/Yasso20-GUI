@@ -97,7 +97,7 @@ class Yasso(HasTraits):
     # How the model will be run
     sample_size = Int()
     duration_unit = Enum(['year', 'month'])
-    timestep_length = Range(low=1)
+    timestep_length = Range(low=1, value=12)
     simulation_length = Range(low=1)
     result_type = Enum(['C stock', 'C change', 'CO2 production'])
     presentation_type = Enum(['chart', 'array'])
