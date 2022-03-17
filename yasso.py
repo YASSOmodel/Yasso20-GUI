@@ -26,11 +26,10 @@ from traits.api import (
 
 from traitsui.message import error
 
-
 from modelcall import ModelRunner
 
 from utils.file_service import open_file, save_file, get_parameter_files
-from utils.constants import DATA_STRING
+from utils.constants import DATA_STRING, ABOUT_TEXT
 from utils.ui import ui_view
 from utils.container_classes import (
     TimedLitterComponent,
@@ -189,8 +188,7 @@ class Yasso(HasTraits):
 
             inipath = os.path.join(exedir, 'yasso.ini')
             cfg.read_file(codecs.open(inipath, "r", "utf8"))
-            about_text = cfg.get("about", "text")
-            about_text = about_text.replace("\\n", "\n")
+            about_text = ABOUT_TEXT
 
             default_param = cfg.get("data", "default_param")
             if default_param in self.p_sets:

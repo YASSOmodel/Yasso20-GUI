@@ -67,3 +67,12 @@ DATA_STRING = """
 [Monthly climate]
 # Data: timestep, mean temperature, precipitation
 """
+
+ABOUT_TEXT = """
+Yasso soil carbon model
+Versions Yasso07, Yasso15 and Yasso20\n
+Yasso20 model by Finnish Meteorological Institute (FMI, www.fmi.fi)
+User interface by Simosol Oy (www.simosol.fi)\n
+The program is distributed under the GNU Lesser General Public License (LGPL)
+The source code is available at https://github.com/YASSOmodel
+"""

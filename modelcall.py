@@ -702,13 +702,13 @@ class ModelRunner(object):
         na = numpy.array
         f32 = numpy.float32
         par = na(self.param, dtype=f32)
-        dur = climate['duration']
+        dur = 1
         init = na(initial, dtype=f32)
         # convert input to yearly input in all cases
         if not self.simulation or self.md.litter_mode == 'constant yearly':
             inf = na(self.infall[sc], dtype=f32)
         else:
-            inf = na(self.infall[sc], dtype=f32) / dur
+            inf = na(self.infall[sc], dtype=f32) / 12
 
         temp = na(climate.get('temp'), dtype=f32)
         rain = climate.get('rain')
