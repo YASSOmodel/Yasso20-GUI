@@ -20,7 +20,10 @@ See www.mingw.org
 Add the MinGW directory to your path, then run the f2py script as follows 
 in the program folder:
 
-f2py -c --fcompiler=gnu95 --compiler=mingw32 -m y15 y15_subroutine.f90 only: mod5c
+f2py -c --fcompiler=gnu95 --compiler=mingw32 -m y07 y07_subroutine_temp.f90 only: mod5c
+f2py -c --fcompiler=gnu95 --compiler=mingw32 -m y15 y15_subroutine_temp.f90 only: mod5c
+f2py -c --fcompiler=gnu95 --compiler=mingw32 -m y20 y20_subroutine.f90 only: mod5c20
+
 
 If you are using Anaconda, before compiling you may need to add the file 
 "distutils.cfg" in your Anaconda/Lib/distutils directory with the content:

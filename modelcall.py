@@ -6,7 +6,7 @@
 import y07, y15, y20
 import numpy
 import math
-import struct
+from utils import loader
 
 from datetime import date
 from dateutil.relativedelta import relativedelta
@@ -210,17 +210,17 @@ class ModelRunner(object):
         if now == -1:
             return -1
         if self.simulation:
-            if self.md.duration_unit == 'month':
-                cl['duration'] = self.md.timestep_length / 12.
-            elif self.md.duration_unit == 'year':
-                cl['duration'] = self.md.timestep_length
+            # if self.md.duration_unit == 'month':
+            #     cl['duration'] = self.md.timestep_length / 12.
+            # if self.md.duration_unit == 'year':
+            cl['duration'] = self.md.timestep_length
         else:
             # cl['duration'] = STEADY_STATE_TIMESTEP
             cl['duration'] = self.md.timestep_length
         if self.md.climate_mode == 'constant yearly':
             cl['rain'] = self.md.constant_climate.annual_rainfall
             cl['temp'] = self.md.constant_climate.mean_temperature
-            cl['amplitude'] = self.md.constant_climate.variation_amplitude
+            # cl['amplitude'] = self.md.constant_climate.variation_amplitude
         elif self.md.climate_mode == 'monthly':
             cl = self._construct_monthly_climate(cl, now, end)
         elif self.md.climate_mode == 'yearly':
@@ -264,7 +264,7 @@ class ModelRunner(object):
             self.curr_month_ind += 1
         cl['rain'] = rain / len(months)
         cl['temp'] = temp / len(months)
-        cl['amplitude'] = (maxtemp - mintemp) / 2.0
+        # cl['amplitude'] = (maxtemp - mintemp) / 2.0
 
         return cl
 
@@ -321,24 +321,28 @@ class ModelRunner(object):
                 weight = 1.0
             temp += weight * cy.mean_temperature
             rain += weight * cy.annual_rainfall
-            ampl += weight * cy.variation_amplitude
+            # ampl += weight * cy.variation_amplitude
             if addyear:
                 self.curr_yr_ind += 1
+
+            attrs = [attr for attr in cy.__dict__.items()]
+            self.temp_list = [value[1] for value in attrs if 'mean_temperature_' in value[0]]
+
         # backs one year back, if the last weight was less than 1
         if weight < 1.0 and addyear:
             self.curr_yr_ind -= 1
             if self.curr_yr_ind < 0:
                 self.curr_yr_ind = len(self.md.yearly_climate) - 1
 
-        for year in self.md.yearly_climate:
-            if len(self.temp_list) < cl.get('duration'):
-                self.temp_list.append(year.mean_temperature)
-            else:
-                break
+        # for year in self.md.yearly_climate:
+        #     if len(self.temp_list) < cl.get('duration'):
+        #         self.temp_list.append(year.mean_temperature)
+        #     else:
+        #         break
 
         cl['temp'] = self.temp_list
         cl['rain'] = rain / len(years)
-        cl['amplitude'] = ampl / len(years)
+        # cl['amplitude'] = ampl / len(years)
         return cl
 
     def __create_input(self, timestep):
@@ -705,10 +709,10 @@ class ModelRunner(object):
         dur = 1
         init = na(initial, dtype=f32)
         # convert input to yearly input in all cases
-        if not self.simulation or self.md.litter_mode == 'constant yearly':
-            inf = na(self.infall[sc], dtype=f32)
-        else:
-            inf = na(self.infall[sc], dtype=f32) / 12
+        # if not self.simulation or self.md.litter_mode == 'constant yearly':
+        inf = na(self.infall[sc], dtype=f32)
+        # else:
+        #     inf = na(self.infall[sc], dtype=f32) / 12
 
         temp = na(climate.get('temp'), dtype=f32)
         rain = climate.get('rain')
@@ -729,6 +733,17 @@ class ModelRunner(object):
                 endstate = y20.yasso20.mod5c20(
                     par, dur, temp, rain, init, inf, sc, leach, steady_state
                 )
+
+            loader.load_parameters(param=self.param,
+                                   dur=dur,
+                                   climate=climate.get('temp'),
+                                   rain=rain,
+                                   inf=self.infall[sc],
+                                   sc=sc,
+                                   leach=leach,
+                                   steady_state=steady_state
+                                   )
+
         else:
             raise Exception("Invalid number of parameters in parameter file.")
 

@@ -22,9 +22,21 @@ class MonthlyClimateAdapter(TabularAdapter):
 
 class YearlyClimateAdapter(TabularAdapter):
     columns = [
-        ('timestep', 'timestep'), ('mean temp', 'mean_temperature'),
+        ('timestep', 'timestep'),
+        ('mean temp 1', 'mean_temperature_1'),
+        ('mean temp 2', 'mean_temperature_2'),
+        ('mean temp 3', 'mean_temperature_3'),
+        ('mean temp 4', 'mean_temperature_4'),
+        ('mean temp 5', 'mean_temperature_5'),
+        ('mean temp 6', 'mean_temperature_6'),
+        ('mean temp 7', 'mean_temperature_7'),
+        ('mean temp 8', 'mean_temperature_8'),
+        ('mean temp 9', 'mean_temperature_9'),
+        ('mean temp 10', 'mean_temperature_10'),
+        ('mean temp 11', 'mean_temperature_11'),
+        ('mean temp 12', 'mean_temperature_12'),
         ('annual rainfall', 'annual_rainfall'),
-        ('temp variation amplitude', 'variation_amplitude')
+        # ('temp variation amplitude', 'variation_amplitude')
     ]
     font = FONT_ARIAL
     default_value = YearlyClimate()

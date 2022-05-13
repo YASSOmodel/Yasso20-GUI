@@ -95,8 +95,8 @@ class Yasso(HasTraits):
 
     # How the model will be run
     sample_size = Int()
-    duration_unit = Enum(['year', 'month'])
-    timestep_length = Range(low=1, value=12)
+    duration_unit = Enum(['year'])
+    timestep_length = Range(low=1, value=1)
     simulation_length = Range(low=1)
     result_type = Enum(['C stock', 'C change', 'CO2 production'])
     presentation_type = Enum(['chart', 'array'])
@@ -368,6 +368,11 @@ class Yasso(HasTraits):
             error(errmsg, title='Invalid model parameters', buttons=['OK'])
             return
 
+        if self.initial_mode == 'steady state' and self.litter_mode == 'zero':
+            errmsg = ("Soil carbon input cannot be zero when using steady state.")
+            error(errmsg, title='Invalid model parameters', buttons=['OK'])
+            return
+
         yassorunner = ModelRunner(parfile)
 
         if not yassorunner.is_usable_parameter_file():
@@ -513,7 +518,7 @@ class Yasso(HasTraits):
         self.area_change = []
         self.constant_climate.mean_temperature = 0
         self.constant_climate.annual_rainfall = 0
-        self.constant_climate.variation_amplitude = 0
+        # self.constant_climate.variation_amplitude = 0
         self.yearly_climate = []
         self.monthly_climate = []
 
@@ -589,14 +594,31 @@ class Yasso(HasTraits):
                 break
 
     def _set_yearly_climate(self, data):
-        errmsg = 'Yearly climate should contain: timestep, mean temperature,\n' \
-                 'annual rainfall and temperature variation amplitude'
+        errmsg = 'Yearly climate should contain: timestep, mean temperature \n' \
+                 'and annual rainfall'
         for vals in data:
             if len(vals) == 4:
+                mean_temperature = (
+                    vals[1] + vals[1] + vals[1] + vals[1] +
+                    vals[1] + vals[1] + vals[1] + vals[1] +
+                    vals[1] + vals[1] + vals[1] + vals[1]
+                ) / 12
                 obj = YearlyClimate(timestep=int(vals[0]),
-                                    mean_temperature=vals[1],
-                                    annual_rainfall=vals[2],
-                                    variation_amplitude=vals[3])
+                                    mean_temperature_1=vals[1],
+                                    mean_temperature_2=vals[1],
+                                    mean_temperature_3=vals[1],
+                                    mean_temperature_4=vals[1],
+                                    mean_temperature_5=vals[1],
+                                    mean_temperature_6=vals[1],
+                                    mean_temperature_7=vals[1],
+                                    mean_temperature_8=vals[1],
+                                    mean_temperature_9=vals[1],
+                                    mean_temperature_10=vals[1],
+                                    mean_temperature_11=vals[1],
+                                    mean_temperature_12=vals[1],
+                                    mean_temperature=mean_temperature,
+                                    annual_rainfall=vals[2])
+                                    # variation_amplitude=vals[3])
                 self.yearly_climate.append(obj)
             elif vals != []:
                 errmsg = errmsg + '\n%s data values found, 4 needed' % (len(data))
@@ -606,11 +628,16 @@ class Yasso(HasTraits):
 
     def _set_constant_climate(self, data):
         errmsg = 'Constant climate should contain: mean temperature,\n' \
-                 'annual rainfall and temperature variation amplitude'
+                 'and annual rainfall'
         if len(data[0]) == 3:
+            mean_temperature = (
+                data[0][0] + data[0][0] + data[0][0] + data[0][0] +
+                data[0][0] + data[0][0] + data[0][0] + data[0][0] +
+                data[0][0] + data[0][0] + data[0][0] + data[0][0]
+            ) / 12
             self.constant_climate.mean_temperature = data[0][0]
             self.constant_climate.annual_rainfall = data[0][1]
-            self.constant_climate.variation_amplitude = data[0][2]
+            # self.constant_climate.variation_amplitude = data[0][2]
         elif data[0] != []:
             errmsg = errmsg + '\n%s data values found, 3 needed' % (len(data))
             error(errmsg, title='error reading data',

@@ -46,9 +46,21 @@ class AreaChange(HasTraits):
 
 class YearlyClimate(HasTraits):
     timestep = Int()
+    mean_temperature_1 = Float()
+    mean_temperature_2 = Float()
+    mean_temperature_3 = Float()
+    mean_temperature_4 = Float()
+    mean_temperature_5 = Float()
+    mean_temperature_6 = Float()
+    mean_temperature_7 = Float()
+    mean_temperature_8 = Float()
+    mean_temperature_9 = Float()
+    mean_temperature_10 = Float()
+    mean_temperature_11 = Float()
+    mean_temperature_12 = Float()
     mean_temperature = Float()
     annual_rainfall = Float()
-    variation_amplitude = Float()
+    # variation_amplitude = Float()
 
 
 class MonthlyClimate(HasTraits):

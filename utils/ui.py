@@ -122,8 +122,8 @@ ui_view = View(
                              style='readonly', ),
                         Item('object.constant_climate.annual_rainfall',
                              style='readonly', ),
-                        Item('object.constant_climate.variation_amplitude',
-                             style='readonly', ),
+                        # Item('object.constant_climate.variation_amplitude',
+                        #      style='readonly', ),
                         show_border=True,
                         visible_when='climate_mode=="constant yearly"'
                     ),
@@ -190,7 +190,7 @@ ui_view = View(
             label='Model run',
         ),
         VGroup(
-            Label(label='Yasso15 soil carbon model', emphasized=True),
+            Label(label='Yasso soil carbon model', emphasized=True),
             Label(label="<placeholder>", id="about_text"),
             label='About',
         ),
