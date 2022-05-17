@@ -597,31 +597,31 @@ class Yasso(HasTraits):
         errmsg = 'Yearly climate should contain: timestep, mean temperature \n' \
                  'and annual rainfall'
         for vals in data:
-            if len(vals) == 4:
+            if len(vals) == 14:
                 mean_temperature = (
-                    vals[1] + vals[1] + vals[1] + vals[1] +
-                    vals[1] + vals[1] + vals[1] + vals[1] +
-                    vals[1] + vals[1] + vals[1] + vals[1]
+                    vals[1] + vals[2] + vals[3] + vals[4] +
+                    vals[5] + vals[6] + vals[7] + vals[8] +
+                    vals[9] + vals[10] + vals[11] + vals[12]
                 ) / 12
                 obj = YearlyClimate(timestep=int(vals[0]),
                                     mean_temperature_1=vals[1],
-                                    mean_temperature_2=vals[1],
-                                    mean_temperature_3=vals[1],
-                                    mean_temperature_4=vals[1],
-                                    mean_temperature_5=vals[1],
-                                    mean_temperature_6=vals[1],
-                                    mean_temperature_7=vals[1],
-                                    mean_temperature_8=vals[1],
-                                    mean_temperature_9=vals[1],
-                                    mean_temperature_10=vals[1],
-                                    mean_temperature_11=vals[1],
-                                    mean_temperature_12=vals[1],
+                                    mean_temperature_2=vals[2],
+                                    mean_temperature_3=vals[3],
+                                    mean_temperature_4=vals[4],
+                                    mean_temperature_5=vals[5],
+                                    mean_temperature_6=vals[6],
+                                    mean_temperature_7=vals[7],
+                                    mean_temperature_8=vals[8],
+                                    mean_temperature_9=vals[9],
+                                    mean_temperature_10=vals[10],
+                                    mean_temperature_11=vals[11],
+                                    mean_temperature_12=vals[12],
                                     mean_temperature=mean_temperature,
-                                    annual_rainfall=vals[2])
+                                    annual_rainfall=vals[13])
                                     # variation_amplitude=vals[3])
                 self.yearly_climate.append(obj)
             elif vals != []:
-                errmsg = errmsg + '\n%s data values found, 4 needed' % (len(data))
+                errmsg = errmsg + '\n%s data values found, 14 needed' % (len(data))
                 error(errmsg, title='error reading data',
                       buttons=['OK'])
                 break
@@ -630,11 +630,11 @@ class Yasso(HasTraits):
         errmsg = 'Constant climate should contain: mean temperature,\n' \
                  'and annual rainfall'
         if len(data[0]) == 3:
-            mean_temperature = (
-                data[0][0] + data[0][0] + data[0][0] + data[0][0] +
-                data[0][0] + data[0][0] + data[0][0] + data[0][0] +
-                data[0][0] + data[0][0] + data[0][0] + data[0][0]
-            ) / 12
+            # mean_temperature = (
+            #     data[0][0] + data[0][1] + data[0][2] + data[0][3] +
+            #     data[0][4] + data[0][5] + data[0][6] + data[0][7] +
+            #     data[0][8] + data[0][9] + data[0][10] + data[0][11]
+            # ) / 12
             self.constant_climate.mean_temperature = data[0][0]
             self.constant_climate.annual_rainfall = data[0][1]
             # self.constant_climate.variation_amplitude = data[0][2]
