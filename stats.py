@@ -478,7 +478,10 @@ def skew(a, axis=0, bias=True):
     m2 = moment(a, 2, axis)
     m3 = moment(a, 3, axis)
     zero = (m2 == 0)
-    vals = np.where(zero, 0, m3 / m2 ** 1.5)
+    if m2 != 0:
+        vals = np.where(zero, 0, m3 / m2 ** 1.5)
+    else:
+        vals = np.where(zero, 0, 0)
     if not bias:
         can_correct = (n > 2) & (m2 > 0)
         if np.any(can_correct):
@@ -525,7 +528,10 @@ def kurtosis(a, axis=0, fisher=True, bias=True):
     m2 = moment(a, 2, axis)
     m4 = moment(a, 4, axis)
     zero = (m2 == 0)
-    vals = np.where(zero, 0, m4 / m2 ** 2.0)
+    if m2 != 0:
+        vals = np.where(zero, 0, m4 / m2 ** 2.0)
+    else:
+        vals = np.where(zero, 0, 0)
     if not bias:
         can_correct = (n > 3) & (m2 > 0)
         if can_correct.any():
