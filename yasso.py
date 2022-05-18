@@ -196,6 +196,10 @@ class Yasso(HasTraits):
 
             self.trait_view('about_text').label = about_text
 
+            check_file = os.path.exists(exedir + '\param\parameters.txt')
+            if check_file is True:
+                os.remove(exedir + '\param\parameters.txt')
+
         except Exception as error:
             print("Error reading yasso.ini. See the error log for details.")
             raise error
