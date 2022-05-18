@@ -265,9 +265,7 @@ class Yasso(HasTraits):
         if common_scale:
             for pl in (stom, swoody, snonwoody, sa, sw, se, sn, sh):
                 pl.value_range.set_bounds(min, max)
-        container = GridContainer(stom, swoody, snonwoody, sa, sw, se, sn, sh)
-        container.shape = (3, 3)
-        container.spacing = (-8, -8)
+        container = GridContainer(stom, swoody, snonwoody, sa, sw, se, sn, sh, shape=(3, 3), spacing=(-8, -8))
         self.stock_plots = container
 
     def _create_change_plots(self, common_scale=False):
@@ -291,9 +289,7 @@ class Yasso(HasTraits):
         if common_scale:
             for pl in (ctom, cwoody, cnonwoody, ca, cw, ce, cn, ch):
                 pl.value_range.set_bounds(min, max)
-        container = GridContainer(ctom, cwoody, cnonwoody, ca, cw, ce, cn, ch)
-        container.shape = (3, 3)
-        container.spacing = (-15, -15)
+        container = GridContainer(ctom, cwoody, cnonwoody, ca, cw, ce, cn, ch, shape=(3, 3), spacing=(-15, -15))
         self.change_plots = container
 
     def _create_co2_plot(self):
@@ -301,8 +297,7 @@ class Yasso(HasTraits):
         min = 0
         co2, max, min = self._create_plot(max, min, self.co2,
                                           'CO2 production (in carbon)')
-        container = GridContainer(co2, Plot(), Plot(), Plot())
-        container.shape = (2, 2)
+        container = GridContainer(co2, Plot(), Plot(), Plot(), shape=(2, 2))
         self.co2_plot = container
 
     def _create_plot(self, max, min, dataobj, title):
