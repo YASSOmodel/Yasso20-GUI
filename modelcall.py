@@ -250,11 +250,13 @@ class ModelRunner(object):
         maxtemp = 0.0
         mintemp = 0.0
         maxind = len(self.md.monthly_climate) - 1
+        self.temp_list = list()
         for m in months:
             if self.curr_month_ind > maxind:
                 self.curr_month_ind = 0
             mtemp = self.md.monthly_climate[self.curr_month_ind].temperature
-            temp += mtemp
+            self.temp_list.append(mtemp)
+            # temp += mtemp
             if mtemp < mintemp:
                 mintemp = mtemp
             if mtemp > maxtemp:
@@ -262,8 +264,8 @@ class ModelRunner(object):
             # monthly rain converted into yearly rain
             rain += 12 * self.md.monthly_climate[self.curr_month_ind].rainfall
             self.curr_month_ind += 1
-        cl['rain'] = rain / len(months)
-        cl['temp'] = temp / len(months)
+        cl['rain'] = rain     # cl['rain'] = rain / len(months)
+        cl['temp'] = self.temp_list # cl['temp'] = temp
         # cl['amplitude'] = (maxtemp - mintemp) / 2.0
 
         return cl

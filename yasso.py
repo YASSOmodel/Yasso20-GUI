@@ -68,7 +68,7 @@ class Yasso(HasTraits):
     area_change = List(trait=AreaChange)
 
     # Climate definition for the simulation
-    climate_mode = Enum(['yearly'])
+    climate_mode = Enum(['yearly', 'monthly'])
     yearly_climate = List(trait=YearlyClimate)
     constant_climate = YearlyClimate()
     monthly_climate = List(
