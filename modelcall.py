@@ -246,26 +246,28 @@ class ModelRunner(object):
             # use the first year for steady state computation
             months = range(12)
         rain = 0.0
-        temp = 0.0
-        maxtemp = 0.0
-        mintemp = 0.0
+        # temp = 0.0
+        # maxtemp = 0.0
+        # mintemp = 0.0
         maxind = len(self.md.monthly_climate) - 1
         self.temp_list = list()
-        for m in months:
-            if self.curr_month_ind > maxind:
-                self.curr_month_ind = 0
-            mtemp = self.md.monthly_climate[self.curr_month_ind].temperature
-            self.temp_list.append(mtemp)
-            # temp += mtemp
-            if mtemp < mintemp:
-                mintemp = mtemp
-            if mtemp > maxtemp:
-                maxtemp = mtemp
-            # monthly rain converted into yearly rain
-            rain += 12 * self.md.monthly_climate[self.curr_month_ind].rainfall
-            self.curr_month_ind += 1
-        cl['rain'] = rain     # cl['rain'] = rain / len(months)
-        cl['temp'] = self.temp_list # cl['temp'] = temp
+
+        if self.curr_month_ind > maxind:
+            self.curr_month_ind = 0
+        mtemp = self.md.monthly_climate[self.curr_month_ind].temperature
+        self.temp_list = [mtemp for i in range(12)]
+
+        # if mtemp < mintemp:`
+        #     mintemp = mtemp
+        # if mtemp > maxtemp:
+        #     maxtemp = mtemp
+
+        # monthly rain converted into yearly rain
+        rain += 12 * self.md.monthly_climate[self.curr_month_ind].rainfall
+        self.curr_month_ind += 1
+
+        cl['rain'] = rain
+        cl['temp'] = self.temp_list
         # cl['amplitude'] = (maxtemp - mintemp) / 2.0
 
         return cl
@@ -708,7 +710,10 @@ class ModelRunner(object):
         na = numpy.array
         f32 = numpy.float32
         par = na(self.param, dtype=f32)
-        dur = 1
+        if self.md.climate_mode == 'monthly':
+            dur = 1/12
+        else:
+            dur = 1
         init = na(initial, dtype=f32)
         # convert input to yearly input in all cases
         # if not self.simulation or self.md.litter_mode == 'constant yearly':
