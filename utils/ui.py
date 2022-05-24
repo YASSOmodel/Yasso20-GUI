@@ -141,8 +141,8 @@ ui_view = View(
                          ),
                     Item('timestep_length', width=-45,
                          style='readonly'),
-                    Item('duration_unit', style='custom',
-                         show_label=False, ),
+                    # Item('duration_unit', style='custom',
+                    #      show_label=False, ),
                 ),
                 HGroup(
                     Item('woody_size_limit', width=-45,

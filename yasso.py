@@ -95,7 +95,7 @@ class Yasso(HasTraits):
 
     # How the model will be run
     sample_size = Int()
-    duration_unit = Enum(['year'])
+    # duration_unit = Enum(['year'])
     timestep_length = Range(low=1, value=1)
     simulation_length = Range(low=1)
     result_type = Enum(['C stock', 'C change', 'CO2 production'])
@@ -775,8 +775,8 @@ class Yasso(HasTraits):
         hstr += '#   soil carbon input: ' + self.litter_mode + '\n'
         hstr += '#   climate: ' + self.climate_mode + '\n'
         hstr += '#   sample size: ' + str(self.sample_size) + '\n'
-        hstr += ''.join(['#   timestep length: ', str(self.timestep_length),
-                         ' (', self.duration_unit, ')\n'])
+        hstr += ''.join(['#   timestep length: ', str(self.timestep_length)])
+                         # ' (', self.duration_unit, ')\n'])
         hstr += '#   woody litter size limit: ' + str(self.woody_size_limit) + '\n'
         hstr += '#\n'
         return hstr + header
