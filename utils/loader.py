@@ -26,5 +26,5 @@ def load_parameters(param, dur, climate, rain, inf, sc, leach, steady_state):
             {'leach': leach},
             {'steady_state': steady_state}
         ]
-        with open('param/parameters.txt', 'a') as f:
+        with open('parameters.txt', 'a') as f:
             json.dump(obj, f, indent=4)
