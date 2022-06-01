@@ -372,6 +372,16 @@ class Yasso(HasTraits):
             error(errmsg, title='Invalid model parameters', buttons=['OK'])
             return
 
+        if self.initial_mode == 'zero' and self.litter_mode == 'monthly' and self.climate_mode == 'yearly':
+            errmsg = ("You cannot use yearly climate input with monthly soil carbon input!")
+            error(errmsg, title='Invalid model parameters', buttons=['OK'])
+            return
+
+        if self.initial_mode == 'steady state' and self.litter_mode == 'monthly' and self.climate_mode == 'yearly':
+            errmsg = ("You cannot use yearly climate input with monthly soil carbon input!")
+            error(errmsg, title='Invalid model parameters', buttons=['OK'])
+            return
+
         yassorunner = ModelRunner(parfile)
 
         if not yassorunner.is_usable_parameter_file():

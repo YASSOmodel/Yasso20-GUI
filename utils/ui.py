@@ -93,14 +93,14 @@ ui_view = View(
                          width=-790, height=-75
                          ),
                 ),
-                HGroup(
-                    Item('area_change',
-                         visible_when='litter_mode=="yearly" or litter_mode=="monthly"',
-                         show_label=False, editor=change_te, springy=False,
-                         width=-150, height=-75
-                         ),
-                    spring,
-                ),
+                # HGroup(
+                #     Item('area_change',
+                #          visible_when='litter_mode=="yearly" or litter_mode=="monthly"',
+                #          show_label=False, editor=change_te, springy=False,
+                #          width=-150, height=-75
+                #          ),
+                #     spring,
+                # ),
             ),
             VGroup(
                 HGroup(
