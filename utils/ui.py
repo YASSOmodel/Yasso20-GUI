@@ -80,17 +80,17 @@ ui_view = View(
                     Item('constant_litter',
                          visible_when='litter_mode=="constant yearly"',
                          show_label=False, editor=litter_te, springy=False,
-                         width=-790, height=-75
+                         width=-790, height=-100
                          ),
                     Item('monthly_litter',
                          visible_when='litter_mode=="monthly"',
                          show_label=False, editor=timed_litter_te, springy=False,
-                         width=-790, height=-75
+                         width=-790, height=-300
                          ),
                     Item('yearly_litter',
                          visible_when='litter_mode=="yearly"',
                          show_label=False, editor=timed_litter_te, springy=False,
-                         width=-790, height=-75
+                         width=-790, height=-300
                          ),
                 ),
                 # HGroup(
