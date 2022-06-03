@@ -15,6 +15,7 @@ def load_parameters(param, dur, climate, rain, inf, sc, leach, steady_state):
     inipath = os.path.join(exedir, 'yasso.ini')
     cfg.read_file(codecs.open(inipath, "r", "utf8"))
     debug_param = cfg.get("debug", "debug")
+    file_path = os.path.join(exedir, 'parameters.txt')
     if debug_param.lower() == 'true':
         obj = [
             {'param': param},
@@ -26,5 +27,5 @@ def load_parameters(param, dur, climate, rain, inf, sc, leach, steady_state):
             {'leach': leach},
             {'steady_state': steady_state}
         ]
-        with open('parameters.txt', 'a') as f:
+        with open(file_path, 'a') as f:
             json.dump(obj, f, indent=4)

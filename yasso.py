@@ -196,9 +196,10 @@ class Yasso(HasTraits):
 
             self.trait_view('about_text').label = about_text
 
-            check_file = os.path.exists(exedir + 'parameters.txt')
+            file_path = os.path.join(exedir, 'parameters.txt')
+            check_file = os.path.exists(file_path)
             if check_file is True:
-                os.remove(exedir + 'parameters.txt')
+                os.remove(file_path)
 
         except Exception as error:
             print("Error reading yasso.ini. See the error log for details.")
@@ -369,6 +370,21 @@ class Yasso(HasTraits):
 
         if self.initial_mode == 'steady state' and self.litter_mode == 'zero':
             errmsg = ("Soil carbon input cannot be zero when using steady state.")
+            error(errmsg, title='Invalid model parameters', buttons=['OK'])
+            return
+
+        if self.initial_mode == 'non zero' and self.litter_mode == 'monthly' and self.climate_mode == 'yearly':
+            errmsg = ("You cannot use yearly climate input with monthly soil carbon input!")
+            error(errmsg, title='Invalid model parameters', buttons=['OK'])
+            return
+
+        if self.initial_mode == 'zero' and self.litter_mode == 'monthly' and self.climate_mode == 'yearly':
+            errmsg = ("You cannot use yearly climate input with monthly soil carbon input!")
+            error(errmsg, title='Invalid model parameters', buttons=['OK'])
+            return
+
+        if self.initial_mode == 'steady state' and self.litter_mode == 'monthly' and self.climate_mode == 'yearly':
+            errmsg = ("You cannot use yearly climate input with monthly soil carbon input!")
             error(errmsg, title='Invalid model parameters', buttons=['OK'])
             return
 
